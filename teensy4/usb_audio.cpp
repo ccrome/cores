@@ -32,6 +32,8 @@
 #include "usb_dev.h"
 #include "usb_audio.h"
 #include "debug/printf.h"
+#include "../../libraries/Audio/utility/imxrt_hw.h"
+
 extern void debug_toggle(int pin);
 extern void debug_pin_high(int pin);
 extern void debug_pin_low(int pin);
@@ -161,7 +163,6 @@ static audio_block_t *channel_data[USB_AUDIO_RX_CHANNELS];
 void usb_audio_receive_callback(unsigned int len_bytes)
 {
         AudioInputUSB::receive_flag = 1;
-
         // 1 frame = 4 bytes: 2 left, 2 right for stereo
         // len_frames this is the number of frames coming in from the USB.
         uint32_t len_frames = len_bytes/USB_AUDIO_BYTES_PER_SAMPLE/USB_AUDIO_RX_CHANNELS;
@@ -447,6 +448,7 @@ void inject_ramp(uint32_t target, uint16_t *buffer) {
 unsigned int usb_audio_transmit_callback(void)
 {
 	static uint32_t count=AUDIO_BASEFRAMES_EXTRA>>1;
+	audio_clock_sync_usb();
 	uint32_t target, len_frames=0;
 	audio_block_t *blocks[USB_AUDIO_TX_CHANNELS];
 
